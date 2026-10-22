@@ -1,0 +1,67 @@
+[
+  {
+    "id": "comunicacao-v4-03-00-tissV4_03_00",
+    "nome": "Esquema Principal de Mensagens TISS v04.03.00",
+    "componente": "COMUNICACAO",
+    "versaoDeclarada": "04.03.00",
+    "enderecoOrigem": "https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss",
+    "dataConsulta": "2026-10-22",
+    "dataPublicacao": "2024-04-01",
+    "nomeArquivo": "tissV4_03_00.xsd",
+    "hashSha256": "4f53c150c226a26e85e2b9c7cf8eb6116fce8f0ad562df8a2f4efbc4e6a8e8b0",
+    "estadoIntegridade": "INTEGRO",
+    "observacoes": "Esquema raiz para validacao de mensagens operacionais TISS."
+  },
+  {
+    "id": "comunicacao-v4-03-00-tissGuiasV4_03_00",
+    "nome": "Esquema de Guias TISS v04.03.00",
+    "componente": "COMUNICACAO",
+    "versaoDeclarada": "04.03.00",
+    "enderecoOrigem": "https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss",
+    "dataConsulta": "2026-10-22",
+    "dataPublicacao": "2024-04-01",
+    "nomeArquivo": "tissGuiasV4_03_00.xsd",
+    "hashSha256": "8c35b6df8257d07942e612a47ea11bb0e816a2c3fb668d29837a76c8c5c7bb71",
+    "estadoIntegridade": "INTEGRO",
+    "observacoes": "Esquema de definicao das guias de faturamento, consulta e solicitacao de procedimentos."
+  },
+  {
+    "id": "comunicacao-v4-03-00-tissComplexTypesV4_03_00",
+    "nome": "Esquema de Tipos Complexos TISS v04.03.00",
+    "componente": "COMUNICACAO",
+    "versaoDeclarada": "04.03.00",
+    "enderecoOrigem": "https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss",
+    "dataConsulta": "2026-10-22",
+    "dataPublicacao": "2024-04-01",
+    "nomeArquivo": "tissComplexTypesV4_03_00.xsd",
+    "hashSha256": "12db8bc55eaec4d98a0ebc8e6308cf26fbc193b2a265d38865f577dbf457ffad",
+    "estadoIntegridade": "INTEGRO",
+    "observacoes": "Tipos estruturados reutilizaveis pelo padrao TISS."
+  },
+  {
+    "id": "comunicacao-v4-03-00-tissSimpleTypesV4_03_00",
+    "nome": "Esquema de Tipos Simples TISS v04.03.00",
+    "componente": "COMUNICACAO",
+    "versaoDeclarada": "04.03.00",
+    "enderecoOrigem": "https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss",
+    "dataConsulta": "2026-10-22",
+    "dataPublicacao": "2024-04-01",
+    "nomeArquivo": "tissSimpleTypesV4_03_00.xsd",
+    "hashSha256": "9b1248e3cf352db88849bca7ffc6422b9b772ee6b5aa456e729cfebc5825bb67",
+    "estadoIntegridade": "INTEGRO",
+    "observacoes": "Restricoes, formatos e dominios de campos primitivos."
+  },
+  {
+    "id": "comunicacao-v4-03-00-tissWebServicesV4_03_00",
+    "nome": "Esquema de Web Services TISS v04.03.00",
+    "componente": "COMUNICACAO",
+    "versaoDeclarada": "04.03.00",
+    "enderecoOrigem": "https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss",
+    "dataConsulta": "2026-10-22",
+    "dataPublicacao": "2024-04-01",
+    "nomeArquivo": "tissWebServicesV4_03_00.xsd",
+    "hashSha256": "63a9fb01cf4a54c9c64b584d9435b6c201dfc33bf8e860956b9c97b819fbc743",
+    "estadoIntegridade": "INTEGRO",
+    "observacoes": "Esquema para comunicacao sincronica via SOAP Web Services."
+  }
+]
