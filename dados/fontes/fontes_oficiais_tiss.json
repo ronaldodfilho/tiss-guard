@@ -1,0 +1,43 @@
+{
+  "orgaoRegulador": "Agencia Nacional de Saude Suplementar (ANS)",
+  "sigla": "ANS",
+  "portalOficial": "https://www.gov.br/ans/pt-br/assuntos/prestadores/padrao-para-troca-de-informacao-de-saude-suplementar-2013-tiss",
+  "dataConsultaReferencia": "2026-10-22",
+  "componentesPadrao": [
+    {
+      "nome": "Organizacional",
+      "descricao": "Estabelece as diretrizes gerais, comissoes e governanca do padrao TISS"
+    },
+    {
+      "nome": "Conteudo e Estrutura",
+      "descricao": "Define a estrutura logica das informacoes e o modelo de dados dos atendimentos e faturamentos em saude"
+    },
+    {
+      "nome": "Representacao de Conceitos em Saude (TUSS)",
+      "descricao": "Terminologia Unificada da Saude Suplementar para procedimentos, eventos e diarias"
+    },
+    {
+      "nome": "Seguranca e Privacidade",
+      "descricao": "Diretrizes de protecao de dados, sigilo profissional e conformidade legal"
+    },
+    {
+      "nome": "Comunicacao",
+      "descricao": "Define as regras de transmissao eletronica de mensagens em formato XML, especificacoes de esquemas XSD e descritores WSDL de Web Services",
+      "esquemaXml": {
+        "versaoPiloto": "04.03.00",
+        "formato": "XSD",
+        "arquivosPrincipais": [
+          "tissV4_03_00.xsd",
+          "tissGuiasV4_03_00.xsd",
+          "tissComplexTypesV4_03_00.xsd",
+          "tissSimpleTypesV4_03_00.xsd",
+          "tissWebServicesV4_03_00.xsd"
+        ]
+      }
+    }
+  ],
+  "criteriosProveniencia": {
+    "origemAutorizada": "Portal oficial gov.br/ans",
+    "requisitosIntegridade": "Calculo obrigatorio de hash SHA-256 e prevencao de sobrescrita silenciosa"
+  }
+}
