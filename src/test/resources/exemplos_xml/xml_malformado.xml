@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ans:mensagemTISS xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas">
+    <ans:cabecalho>
+        <ans:identificacaoTransacao>
+            <ans:tipoTransacao>ENVIO_LOTE_GUIAS
+        </ans:identificacaoTransacao>
+</ans:mensagemTISS>

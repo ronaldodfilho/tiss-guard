@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE teste [
+    <!ENTITY xxe SYSTEM "file:///etc/passwd">
+]>
+<ans:mensagemTISS xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas">
+    <ans:cabecalho>&xxe;</ans:cabecalho>
+</ans:mensagemTISS>
