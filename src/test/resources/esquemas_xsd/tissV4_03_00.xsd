@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.ans.gov.br/padroes/tiss/schemas"
+           xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas"
+           elementFormDefault="qualified">
+
+    <xs:element name="mensagemTISS">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="cabecalho" type="ans:ct_cabecalho"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="ct_cabecalho">
+        <xs:sequence>
+            <xs:element name="identificacaoTransacao" type="ans:ct_identificacaoTransacao"/>
+            <xs:element name="origem" type="ans:ct_origem"/>
+            <xs:element name="destino" type="ans:ct_destino"/>
+            <xs:element name="versaoPadrao" type="ans:st_versao"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ct_identificacaoTransacao">
+        <xs:sequence>
+            <xs:element name="tipoTransacao" type="xs:string"/>
+            <xs:element name="sequencialTransacao" type="xs:string"/>
+            <xs:element name="dataRegistroTransacao" type="xs:date"/>
+            <xs:element name="horaRegistroTransacao" type="xs:time"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ct_origem">
+        <xs:sequence>
+            <xs:element name="identificacaoPrestador">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="codigoPrestadorNaOperadora" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ct_destino">
+        <xs:sequence>
+            <xs:element name="registroANS">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[0-9]{6}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="st_versao">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{2}\.[0-9]{2}\.[0-9]{2}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
