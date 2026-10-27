@@ -26,4 +26,12 @@ public record ResultadoValidacao(
     public boolean isValido() {
         return status == StatusValidacao.VALIDO;
     }
+
+    public boolean temErroSintaxe() {
+        return erros.stream().anyMatch(erro -> erro.categoria() == CategoriaErroValidacao.SINTAXE_XML);
+    }
+
+    public boolean temErroEsquema() {
+        return erros.stream().anyMatch(erro -> erro.categoria() == CategoriaErroValidacao.ESQUEMA_XSD);
+    }
 }

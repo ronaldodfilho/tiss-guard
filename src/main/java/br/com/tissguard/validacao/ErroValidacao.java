@@ -5,12 +5,18 @@ import java.util.Objects;
 public record ErroValidacao(
         int linha,
         int coluna,
-        String mensagem
+        String mensagem,
+        CategoriaErroValidacao categoria
 ) {
     public ErroValidacao {
         Objects.requireNonNull(mensagem, "A mensagem de erro não pode ser nula");
+        Objects.requireNonNull(categoria, "A categoria do erro não pode ser nula");
         if (mensagem.isBlank()) {
             throw new IllegalArgumentException("A mensagem de erro não pode estar em branco");
         }
+    }
+
+    public ErroValidacao(int linha, int coluna, String mensagem) {
+        this(linha, coluna, mensagem, CategoriaErroValidacao.ESQUEMA_XSD);
     }
 }

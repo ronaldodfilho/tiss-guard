@@ -66,13 +66,65 @@ public class ValidadorXml {
     }
 
     public ResultadoValidacao validar(String nomeArquivo, byte[] conteudoBytes, String versaoEsquema, Source fonteEsquema) {
-        DocumentoXml documentoXml = leitorXmlSeguro.ler(nomeArquivo, conteudoBytes);
-        return validar(documentoXml, versaoEsquema, fonteEsquema);
+        try {
+            DocumentoXml documentoXml = leitorXmlSeguro.ler(nomeArquivo, conteudoBytes);
+            return validar(documentoXml, versaoEsquema, fonteEsquema);
+        } catch (XmlMalformadoException e) {
+            ErroValidacao erroSintaxe = new ErroValidacao(
+                    e.getLinha(),
+                    e.getColuna(),
+                    e.getMessage(),
+                    CategoriaErroValidacao.SINTAXE_XML
+            );
+            return new ResultadoValidacao(
+                    nomeArquivo,
+                    versaoEsquema,
+                    StatusValidacao.NAO_CONCLUIDO,
+                    List.of(erroSintaxe),
+                    "Validação não concluída: o arquivo XML é malformado e não pôde ser analisado pelo esquema XSD."
+            );
+        } catch (XmlSegurancaException e) {
+            ErroValidacao erroSeguranca = new ErroValidacao(
+                    -1,
+                    -1,
+                    e.getMessage(),
+                    CategoriaErroValidacao.SEGURANCA
+            );
+            return new ResultadoValidacao(
+                    nomeArquivo,
+                    versaoEsquema,
+                    StatusValidacao.NAO_CONCLUIDO,
+                    List.of(erroSeguranca),
+                    "Validação bloqueada por motivos de segurança: XML contém diretivas não permitidas."
+            );
+        } catch (XmlLimiteExcedidoException e) {
+            ErroValidacao erroLimite = new ErroValidacao(
+                    -1,
+                    -1,
+                    e.getMessage(),
+                    CategoriaErroValidacao.SEGURANCA
+            );
+            return new ResultadoValidacao(
+                    nomeArquivo,
+                    versaoEsquema,
+                    StatusValidacao.NAO_CONCLUIDO,
+                    List.of(erroLimite),
+                    "Validação não concluída: o arquivo XML excede o tamanho máximo permitido."
+            );
+        }
     }
 
     public ResultadoValidacao validar(String nomeArquivo, String conteudoXml, String versaoEsquema, Source fonteEsquema) {
-        DocumentoXml documentoXml = leitorXmlSeguro.ler(nomeArquivo, conteudoXml);
-        return validar(documentoXml, versaoEsquema, fonteEsquema);
+        Objects.requireNonNull(nomeArquivo, "O nome do arquivo XML não pode ser nulo");
+        Objects.requireNonNull(conteudoXml, "O conteúdo XML não pode ser nulo");
+        if (nomeArquivo.isBlank()) {
+            throw new IllegalArgumentException("O nome do arquivo XML não pode estar em branco");
+        }
+        if (conteudoXml.isBlank()) {
+            throw new IllegalArgumentException("O conteúdo XML não pode estar em branco");
+        }
+        byte[] bytes = conteudoXml.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return validar(nomeArquivo, bytes, versaoEsquema, fonteEsquema);
     }
 
     private Schema compilarEsquema(Source fonteEsquema) {
@@ -101,7 +153,8 @@ public class ValidadorXml {
                     erros.add(new ErroValidacao(
                             exception.getLineNumber(),
                             exception.getColumnNumber(),
-                            normalizarMensagem(exception.getMessage())
+                            normalizarMensagem(exception.getMessage()),
+                            CategoriaErroValidacao.ESQUEMA_XSD
                     ));
                 }
 
@@ -110,7 +163,8 @@ public class ValidadorXml {
                     erros.add(new ErroValidacao(
                             exception.getLineNumber(),
                             exception.getColumnNumber(),
-                            normalizarMensagem(exception.getMessage())
+                            normalizarMensagem(exception.getMessage()),
+                            CategoriaErroValidacao.ESQUEMA_XSD
                     ));
                 }
             });
@@ -122,7 +176,7 @@ public class ValidadorXml {
             if (erros.isEmpty()) {
                 int linha = (e instanceof SAXParseException spe) ? spe.getLineNumber() : -1;
                 int coluna = (e instanceof SAXParseException spe) ? spe.getColumnNumber() : -1;
-                erros.add(new ErroValidacao(linha, coluna, normalizarMensagem(e.getMessage())));
+                erros.add(new ErroValidacao(linha, coluna, normalizarMensagem(e.getMessage()), CategoriaErroValidacao.ESQUEMA_XSD));
             }
         } catch (IOException e) {
             throw new IllegalStateException("Falha de E/S durante validação contra o esquema XSD", e);

@@ -3,6 +3,7 @@ package br.com.tissguard.validacao;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -86,7 +87,9 @@ public class LeitorXmlSeguro {
             if (mensagem.contains("doctype") || mensagem.contains("entity") || mensagem.contains("entidade")) {
                 throw new XmlSegurancaException("Tentativa de declaração DOCTYPE ou entidade não permitida no arquivo: " + nomeArquivo, e);
             }
-            throw new XmlMalformadoException("Arquivo XML malformado: " + e.getMessage(), e);
+            int linha = (e instanceof SAXParseException spe) ? spe.getLineNumber() : -1;
+            int coluna = (e instanceof SAXParseException spe) ? spe.getColumnNumber() : -1;
+            throw new XmlMalformadoException("Arquivo XML malformado: " + e.getMessage(), linha, coluna, e);
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Falha técnica ao configurar parser XML", e);
         } catch (IOException e) {
