@@ -25,14 +25,20 @@ import java.util.Objects;
 public class ValidadorXml {
 
     private final LeitorXmlSeguro leitorXmlSeguro;
+    private final TradutorMensagemEsquema tradutorMensagemEsquema;
 
     public ValidadorXml() {
-        this(new LeitorXmlSeguro());
+        this(new LeitorXmlSeguro(), new TradutorMensagemEsquema());
+    }
+
+    public ValidadorXml(LeitorXmlSeguro leitorXmlSeguro) {
+        this(leitorXmlSeguro, new TradutorMensagemEsquema());
     }
 
     @Autowired
-    public ValidadorXml(LeitorXmlSeguro leitorXmlSeguro) {
+    public ValidadorXml(LeitorXmlSeguro leitorXmlSeguro, TradutorMensagemEsquema tradutorMensagemEsquema) {
         this.leitorXmlSeguro = Objects.requireNonNull(leitorXmlSeguro, "O leitor XML não pode ser nulo");
+        this.tradutorMensagemEsquema = Objects.requireNonNull(tradutorMensagemEsquema, "O tradutor de mensagem não pode ser nulo");
     }
 
     public ResultadoValidacao validar(DocumentoXml documentoXml, String versaoEsquema, Source fonteEsquema) {
@@ -221,6 +227,6 @@ public class ValidadorXml {
         if (mensagem == null || mensagem.isBlank()) {
             return "Erro estrutural não especificado no XML.";
         }
-        return mensagem.trim();
+        return tradutorMensagemEsquema.traduzir(mensagem);
     }
 }
