@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ans:mensagemTISS xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas">
+    <ans:cabecalho>
+        <ans:elementoInesperado>invalido</ans:elementoInesperado>
+        <ans:identificacaoTransacao>
+            <ans:tipoTransacao>ENVIO_LOTE_GUIAS</ans:tipoTransacao>
+            <ans:sequencialTransacao>1001</ans:sequencialTransacao>
+            <ans:dataRegistroTransacao>2026-10-23</ans:dataRegistroTransacao>
+            <ans:horaRegistroTransacao>07:50:00</ans:horaRegistroTransacao>
+        </ans:identificacaoTransacao>
+        <ans:origem>
+            <ans:identificacaoPrestador>
+                <ans:codigoPrestadorNaOperadora>PREST_SINTETICO_9988</ans:codigoPrestadorNaOperadora>
+            </ans:identificacaoPrestador>
+        </ans:origem>
+        <ans:destino>
+            <ans:registroANS>123456</ans:registroANS>
+        </ans:destino>
+        <ans:versaoPadrao>04.03.00</ans:versaoPadrao>
+    </ans:cabecalho>
+</ans:mensagemTISS>

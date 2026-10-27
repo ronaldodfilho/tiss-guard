@@ -192,4 +192,118 @@ class ValidadorXmlTest {
         assertThatThrownBy(() -> resultado.erros().add(new ErroValidacao(11, 2, "Outro erro")))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void deveTratarXmlMalformadoRetornandoStatusNaoConcluidoECategoriaSintaxe() {
+        byte[] xmlMalformadoBytes = carregarRecurso("exemplos_xml/xml_malformado.xml");
+        byte[] xsdBytes = carregarRecurso("esquemas_xsd/tissV4_03_00.xsd");
+
+        ResultadoValidacao resultado = validador.validar(
+                "xml_malformado.xml",
+                xmlMalformadoBytes,
+                "04.03.00",
+                new StreamSource(new ByteArrayInputStream(xsdBytes))
+        );
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.isValido()).isFalse();
+        assertThat(resultado.status()).isEqualTo(StatusValidacao.NAO_CONCLUIDO);
+        assertThat(resultado.temErroSintaxe()).isTrue();
+        assertThat(resultado.temErroEsquema()).isFalse();
+        assertThat(resultado.erros()).hasSize(1);
+
+        ErroValidacao erro = resultado.erros().get(0);
+        assertThat(erro.categoria()).isEqualTo(CategoriaErroValidacao.SINTAXE_XML);
+        assertThat(erro.linha()).isPositive();
+        assertThat(erro.coluna()).isPositive();
+        assertThat(erro.mensagem()).contains("malformado");
+    }
+
+    @Test
+    void deveTratarXmlComXxeRetornandoStatusNaoConcluidoECategoriaSeguranca() {
+        byte[] xmlXxeBytes = carregarRecurso("exemplos_xml/xml_com_xxe.xml");
+        byte[] xsdBytes = carregarRecurso("esquemas_xsd/tissV4_03_00.xsd");
+
+        ResultadoValidacao resultado = validador.validar(
+                "xml_com_xxe.xml",
+                xmlXxeBytes,
+                "04.03.00",
+                new StreamSource(new ByteArrayInputStream(xsdBytes))
+        );
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.isValido()).isFalse();
+        assertThat(resultado.status()).isEqualTo(StatusValidacao.NAO_CONCLUIDO);
+        assertThat(resultado.erros()).hasSize(1);
+        assertThat(resultado.erros().get(0).categoria()).isEqualTo(CategoriaErroValidacao.SEGURANCA);
+        assertThat(resultado.mensagemInformativa()).contains("segurança");
+    }
+
+    @Test
+    void deveTraduzirMensagemQuandoElementoObrigatorioEstiverAusente() {
+        byte[] xmlBytes = carregarRecurso("exemplos_xml/mensagem_tiss_elemento_faltante.xml");
+        byte[] xsdBytes = carregarRecurso("esquemas_xsd/tissV4_03_00.xsd");
+
+        ResultadoValidacao resultado = validador.validar(
+                "mensagem_tiss_elemento_faltante.xml",
+                xmlBytes,
+                "04.03.00",
+                new StreamSource(new ByteArrayInputStream(xsdBytes))
+        );
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.status()).isEqualTo(StatusValidacao.INVALIDO);
+        assertThat(resultado.temErroEsquema()).isTrue();
+        assertThat(resultado.temErroSintaxe()).isFalse();
+        assertThat(resultado.erros()).isNotEmpty();
+
+        ErroValidacao primeiroErro = resultado.erros().get(0);
+        assertThat(primeiroErro.categoria()).isEqualTo(CategoriaErroValidacao.ESQUEMA_XSD);
+        assertThat(primeiroErro.mensagem()).contains("Elemento obrigatório ausente ou incompleto");
+        assertThat(primeiroErro.mensagem()).contains("versaoPadrao");
+    }
+
+    @Test
+    void deveTraduzirMensagemQuandoElementoInesperadoForEncontrado() {
+        byte[] xmlBytes = carregarRecurso("exemplos_xml/mensagem_tiss_elemento_inesperado.xml");
+        byte[] xsdBytes = carregarRecurso("esquemas_xsd/tissV4_03_00.xsd");
+
+        ResultadoValidacao resultado = validador.validar(
+                "mensagem_tiss_elemento_inesperado.xml",
+                xmlBytes,
+                "04.03.00",
+                new StreamSource(new ByteArrayInputStream(xsdBytes))
+        );
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.status()).isEqualTo(StatusValidacao.INVALIDO);
+        assertThat(resultado.temErroEsquema()).isTrue();
+        assertThat(resultado.erros()).isNotEmpty();
+
+        ErroValidacao primeiroErro = resultado.erros().get(0);
+        assertThat(primeiroErro.categoria()).isEqualTo(CategoriaErroValidacao.ESQUEMA_XSD);
+        assertThat(primeiroErro.mensagem()).contains("Elemento inesperado");
+        assertThat(primeiroErro.mensagem()).contains("elementoInesperado");
+    }
+
+    @Test
+    void deveTraduzirMensagemQuandoValorNaoAtenderAoPadraoOuTipo() {
+        byte[] xmlBytes = carregarRecurso("exemplos_xml/mensagem_tiss_invalida_esquema.xml");
+        byte[] xsdBytes = carregarRecurso("esquemas_xsd/tissV4_03_00.xsd");
+
+        ResultadoValidacao resultado = validador.validar(
+                "mensagem_tiss_invalida_esquema.xml",
+                xmlBytes,
+                "04.03.00",
+                new StreamSource(new ByteArrayInputStream(xsdBytes))
+        );
+
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.status()).isEqualTo(StatusValidacao.INVALIDO);
+        assertThat(resultado.erros()).isNotEmpty();
+
+        boolean encontrouPadraoOuTipo = resultado.erros().stream()
+                .anyMatch(erro -> erro.mensagem().contains("Valor inválido") || erro.mensagem().contains("Tipo de dado incompatível"));
+        assertThat(encontrouPadraoOuTipo).isTrue();
+    }
 }
