@@ -123,4 +123,75 @@ class CatalogoArtefatosTest {
         assertThatThrownBy(() -> todos.add(artefato))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void deveListarVersoesDistintasPorComponente() {
+        MetadadosArtefato artefatoV403 = criarArtefatoExemplo("art-1", "tissV4_03_00.xsd");
+        MetadadosArtefato artefatoV403Guias = new MetadadosArtefato(
+                "art-2",
+                "Guias TISS",
+                ComponenteTiss.COMUNICACAO,
+                "04.03.00",
+                "https://gov.br",
+                LocalDate.now(),
+                LocalDate.now(),
+                "tissGuiasV4_03_00.xsd",
+                "hash2",
+                EstadoIntegridade.INTEGRO,
+                "Obs"
+        );
+        MetadadosArtefato artefatoV404 = new MetadadosArtefato(
+                "art-3",
+                "Esquema V4.04",
+                ComponenteTiss.COMUNICACAO,
+                "04.04.00",
+                "https://gov.br",
+                LocalDate.now(),
+                LocalDate.now(),
+                "tissV4_04_00.xsd",
+                "hash3",
+                EstadoIntegridade.INTEGRO,
+                "Obs"
+        );
+
+        catalogo.registrarArtefato(artefatoV403);
+        catalogo.registrarArtefato(artefatoV403Guias);
+        catalogo.registrarArtefato(artefatoV404);
+
+        List<String> versoes = catalogo.listarVersoesPorComponente(ComponenteTiss.COMUNICACAO);
+
+        assertThat(versoes).containsExactly("04.03.00", "04.04.00");
+    }
+
+    @Test
+    void deveBuscarArtefatosPorVersao() {
+        MetadadosArtefato artefato1 = criarArtefatoExemplo("art-1", "tissV4_03_00.xsd");
+        catalogo.registrarArtefato(artefato1);
+
+        List<MetadadosArtefato> encontrados = catalogo.buscarPorVersao("04.03.00");
+        assertThat(encontrados).hasSize(1);
+        assertThat(encontrados.get(0).id()).isEqualTo("art-1");
+
+        List<MetadadosArtefato> naoEncontrados = catalogo.buscarPorVersao("04.99.99");
+        assertThat(naoEncontrados).isEmpty();
+    }
+
+    @Test
+    void deveVerificarSePossuiVersaoCadastrada() {
+        MetadadosArtefato artefato1 = criarArtefatoExemplo("art-1", "tissV4_03_00.xsd");
+        catalogo.registrarArtefato(artefato1);
+
+        assertThat(catalogo.possuiVersao("04.03.00")).isTrue();
+        assertThat(catalogo.possuiVersao("04.04.00")).isFalse();
+        assertThat(catalogo.possuiVersao(null)).isFalse();
+        assertThat(catalogo.possuiVersao("   ")).isFalse();
+    }
+
+    @Test
+    void deveRetornarColecoesVaziasParaParametrosNulosOuEmBranco() {
+        assertThat(catalogo.listarVersoesPorComponente(null)).isEmpty();
+        assertThat(catalogo.buscarPorVersao(null)).isEmpty();
+        assertThat(catalogo.buscarPorVersao("   ")).isEmpty();
+    }
 }
+

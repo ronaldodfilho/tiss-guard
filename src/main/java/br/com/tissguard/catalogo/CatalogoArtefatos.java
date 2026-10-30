@@ -74,7 +74,37 @@ public class CatalogoArtefatos {
                 .findFirst();
     }
 
+    public List<String> listarVersoesPorComponente(ComponenteTiss componente) {
+        if (componente == null) {
+            return Collections.emptyList();
+        }
+        return repositorio.values().stream()
+                .filter(artefato -> artefato.componente().equals(componente))
+                .map(MetadadosArtefato::versaoDeclarada)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    public List<MetadadosArtefato> buscarPorVersao(String versao) {
+        if (versao == null || versao.isBlank()) {
+            return Collections.emptyList();
+        }
+        return repositorio.values().stream()
+                .filter(artefato -> artefato.versaoDeclarada().equalsIgnoreCase(versao.trim()))
+                .toList();
+    }
+
+    public boolean possuiVersao(String versao) {
+        if (versao == null || versao.isBlank()) {
+            return false;
+        }
+        return repositorio.values().stream()
+                .anyMatch(artefato -> artefato.versaoDeclarada().equalsIgnoreCase(versao.trim()));
+    }
+
     public int quantidadeArtefatos() {
         return repositorio.size();
     }
 }
+
