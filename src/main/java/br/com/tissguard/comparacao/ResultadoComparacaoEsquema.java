@@ -12,6 +12,7 @@ public record ResultadoComparacaoEsquema(
         String versaoEsquemaComparado,
         String hashEsquemaComparado,
         List<DiferencaEsquema> diferencas,
+        DiagnosticoCompatibilidade diagnostico,
         boolean esquemasIdenticos,
         int totalDiferencas
 ) {
@@ -23,8 +24,34 @@ public record ResultadoComparacaoEsquema(
         Objects.requireNonNull(versaoEsquemaComparado, "A versão do esquema comparado não pode ser nula");
         Objects.requireNonNull(hashEsquemaComparado, "O hash do esquema comparado não pode ser nulo");
         Objects.requireNonNull(diferencas, "A lista de diferenças não pode ser nula");
+        Objects.requireNonNull(diagnostico, "O diagnóstico de compatibilidade não pode ser nulo");
 
         diferencas = Collections.unmodifiableList(diferencas);
+    }
+
+    public ResultadoComparacaoEsquema(
+            String identificadorEsquemaBase,
+            String versaoEsquemaBase,
+            String hashEsquemaBase,
+            String identificadorEsquemaComparado,
+            String versaoEsquemaComparado,
+            String hashEsquemaComparado,
+            List<DiferencaEsquema> diferencas,
+            boolean esquemasIdenticos,
+            int totalDiferencas
+    ) {
+        this(
+                identificadorEsquemaBase,
+                versaoEsquemaBase,
+                hashEsquemaBase,
+                identificadorEsquemaComparado,
+                versaoEsquemaComparado,
+                hashEsquemaComparado,
+                diferencas,
+                DiagnosticoCompatibilidade.gerarPara(diferencas),
+                esquemasIdenticos,
+                totalDiferencas
+        );
     }
 
     public List<DiferencaEsquema> diferencasPorTipo(TipoDiferencaEsquema tipo) {
@@ -34,5 +61,21 @@ public record ResultadoComparacaoEsquema(
         return diferencas.stream()
                 .filter(d -> d.tipo() == tipo)
                 .toList();
+    }
+
+    public List<DiferencaEsquema> quebrasDeContrato() {
+        return diferencas.stream()
+                .filter(DiferencaEsquema::isQuebraDeContrato)
+                .toList();
+    }
+
+    public List<DiferencaEsquema> alteracoesAditivas() {
+        return diferencas.stream()
+                .filter(DiferencaEsquema::isAditiva)
+                .toList();
+    }
+
+    public boolean isCompativelComVersaoAnterior() {
+        return diagnostico.compativelComVersaoAnterior();
     }
 }

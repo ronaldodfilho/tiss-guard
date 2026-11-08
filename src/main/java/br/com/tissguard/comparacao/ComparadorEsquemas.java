@@ -99,6 +99,7 @@ public class ComparadorEsquemas {
         diferencas.sort(Comparator.comparing(DiferencaEsquema::caminhoEstrutural).thenComparing(d -> d.tipo().name()));
 
         boolean identicos = diferencas.isEmpty() && hashBase.equalsIgnoreCase(hashComparado);
+        DiagnosticoCompatibilidade diagnostico = DiagnosticoCompatibilidade.gerarPara(diferencas);
 
         return new ResultadoComparacaoEsquema(
                 idBase,
@@ -108,6 +109,7 @@ public class ComparadorEsquemas {
                 versaoComparado,
                 hashComparado,
                 diferencas,
+                diagnostico,
                 identicos,
                 diferencas.size()
         );
@@ -263,6 +265,7 @@ public class ComparadorEsquemas {
             if (!comparado.containsKey(caminho)) {
                 diferencas.add(new DiferencaEsquema(
                         TipoDiferencaEsquema.ELEMENTO_REMOVIDO,
+                        SeveridadeDiferenca.QUEBRA_DE_CONTRATO,
                         caminho,
                         "Elemento '" + elemBase.nome() + "' removido do esquema",
                         elemBase.tipo(),
@@ -274,6 +277,7 @@ public class ComparadorEsquemas {
                 if (!elemBase.tipo().equalsIgnoreCase(elemComparado.tipo())) {
                     diferencas.add(new DiferencaEsquema(
                             TipoDiferencaEsquema.ELEMENTO_MODIFICADO,
+                            SeveridadeDiferenca.QUEBRA_DE_CONTRATO,
                             caminho,
                             "Tipo do elemento '" + elemBase.nome() + "' alterado de '" + elemBase.tipo() + "' para '" + elemComparado.tipo() + "'",
                             elemBase.tipo(),
@@ -282,8 +286,13 @@ public class ComparadorEsquemas {
                 }
 
                 if (!elemBase.ocorrenciaMinima().equalsIgnoreCase(elemComparado.ocorrenciaMinima())) {
+                    SeveridadeDiferenca severidade = "0".equals(elemComparado.ocorrenciaMinima())
+                            ? SeveridadeDiferenca.ADITIVA
+                            : SeveridadeDiferenca.QUEBRA_DE_CONTRATO;
+
                     diferencas.add(new DiferencaEsquema(
                             TipoDiferencaEsquema.ELEMENTO_MODIFICADO,
+                            severidade,
                             caminho,
                             "Ocorrência mínima (minOccurs) do elemento '" + elemBase.nome() + "' alterada de '" + elemBase.ocorrenciaMinima() + "' para '" + elemComparado.ocorrenciaMinima() + "'",
                             elemBase.ocorrenciaMinima(),
@@ -292,8 +301,13 @@ public class ComparadorEsquemas {
                 }
 
                 if (!elemBase.ocorrenciaMaxima().equalsIgnoreCase(elemComparado.ocorrenciaMaxima())) {
+                    SeveridadeDiferenca severidade = "unbounded".equalsIgnoreCase(elemComparado.ocorrenciaMaxima())
+                            ? SeveridadeDiferenca.ADITIVA
+                            : SeveridadeDiferenca.QUEBRA_DE_CONTRATO;
+
                     diferencas.add(new DiferencaEsquema(
                             TipoDiferencaEsquema.ELEMENTO_MODIFICADO,
+                            severidade,
                             caminho,
                             "Ocorrência máxima (maxOccurs) do elemento '" + elemBase.nome() + "' alterada de '" + elemBase.ocorrenciaMaxima() + "' para '" + elemComparado.ocorrenciaMaxima() + "'",
                             elemBase.ocorrenciaMaxima(),
@@ -308,10 +322,16 @@ public class ComparadorEsquemas {
             DefinicaoElementoEsquema elemComparado = entry.getValue();
 
             if (!base.containsKey(caminho)) {
+                SeveridadeDiferenca severidade = "0".equals(elemComparado.ocorrenciaMinima())
+                        ? SeveridadeDiferenca.ADITIVA
+                        : SeveridadeDiferenca.QUEBRA_DE_CONTRATO;
+
                 diferencas.add(new DiferencaEsquema(
                         TipoDiferencaEsquema.ELEMENTO_ADICIONADO,
+                        severidade,
                         caminho,
-                        "Elemento '" + elemComparado.nome() + "' adicionado ao esquema",
+                        "Elemento '" + elemComparado.nome() + "' adicionado ao esquema (" +
+                        ("0".equals(elemComparado.ocorrenciaMinima()) ? "opcional" : "obrigatório") + ")",
                         null,
                         elemComparado.tipo()
                 ));
@@ -331,6 +351,7 @@ public class ComparadorEsquemas {
             if (!comparado.containsKey(nomeTipo)) {
                 diferencas.add(new DiferencaEsquema(
                         TipoDiferencaEsquema.TIPO_REMOVIDO,
+                        SeveridadeDiferenca.QUEBRA_DE_CONTRATO,
                         nomeTipo,
                         "Tipo '" + nomeTipo + "' removido do esquema",
                         tipoBase.categoria(),
@@ -341,6 +362,7 @@ public class ComparadorEsquemas {
                 if (!tipoBase.categoria().equalsIgnoreCase(tipoComparado.categoria())) {
                     diferencas.add(new DiferencaEsquema(
                             TipoDiferencaEsquema.TIPO_MODIFICADO,
+                            SeveridadeDiferenca.QUEBRA_DE_CONTRATO,
                             nomeTipo,
                             "Categoria do tipo '" + nomeTipo + "' alterada de '" + tipoBase.categoria() + "' para '" + tipoComparado.categoria() + "'",
                             tipoBase.categoria(),
@@ -349,6 +371,7 @@ public class ComparadorEsquemas {
                 } else if (!tipoBase.tipoBase().equalsIgnoreCase(tipoComparado.tipoBase())) {
                     diferencas.add(new DiferencaEsquema(
                             TipoDiferencaEsquema.TIPO_MODIFICADO,
+                            SeveridadeDiferenca.QUEBRA_DE_CONTRATO,
                             nomeTipo,
                             "Tipo base da restrição de '" + nomeTipo + "' alterado de '" + tipoBase.tipoBase() + "' para '" + tipoComparado.tipoBase() + "'",
                             tipoBase.tipoBase(),
@@ -365,6 +388,7 @@ public class ComparadorEsquemas {
             if (!base.containsKey(nomeTipo)) {
                 diferencas.add(new DiferencaEsquema(
                         TipoDiferencaEsquema.TIPO_ADICIONADO,
+                        SeveridadeDiferenca.ADITIVA,
                         nomeTipo,
                         "Tipo '" + nomeTipo + "' adicionado ao esquema",
                         null,
