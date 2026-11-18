@@ -177,4 +177,79 @@ class AgenteInvestigadorTest {
                 .contains("04.03.00")
                 .contains("hashSha256Oficial");
     }
+
+    @Test
+    void deveRecusarInvestigacaoQuandoPerguntaForForaDeEscopo() {
+        PerguntaInvestigacao pergunta = PerguntaInvestigacao.foraDeEscopo(
+                "Qual o valor financeiro glosado desta fatura?"
+        );
+
+        RespostaInvestigacao resposta = agente.investigar(pergunta);
+
+        assertThat(resposta.evidenciaSuficiente()).isFalse();
+        assertThat(resposta.ferramentaUtilizada()).isEqualTo("nenhuma");
+        assertThat(resposta.explicacaoFundamentada()).contains("fora do escopo técnico");
+        assertThat(resposta.limitacaoOuAlerta()).contains("dados reais de pacientes");
+    }
+
+    @Test
+    void deveDeclararEvidenciaInsuficienteQuandoDadosNaoForemFornecidosParaValidacao() {
+        PerguntaInvestigacao perguntaSemDados = new PerguntaInvestigacao(
+                TipoPerguntaInvestigacao.VALIDACAO_XML,
+                "Valide este XML",
+                null,
+                null,
+                null
+        );
+
+        RespostaInvestigacao resposta = agente.investigar(perguntaSemDados);
+
+        assertThat(resposta.evidenciaSuficiente()).isFalse();
+        assertThat(resposta.explicacaoFundamentada()).contains("Evidência insuficiente");
+    }
+
+    @Test
+    void deveDeclararEvidenciaInsuficienteQuandoDadosNaoForemFornecidosParaComparacao() {
+        PerguntaInvestigacao perguntaSemDados = new PerguntaInvestigacao(
+                TipoPerguntaInvestigacao.COMPARACAO_ESQUEMAS,
+                "Compare as versões",
+                null,
+                null,
+                null
+        );
+
+        RespostaInvestigacao resposta = agente.investigar(perguntaSemDados);
+
+        assertThat(resposta.evidenciaSuficiente()).isFalse();
+        assertThat(resposta.explicacaoFundamentada()).contains("Evidência insuficiente");
+    }
+
+    @Test
+    void deveDeclararEvidenciaInsuficienteQuandoConsultaNaoRetornarArtefatos() {
+        when(ferramentaConsulta.executar(any())).thenReturn(List.of());
+
+        PerguntaInvestigacao pergunta = PerguntaInvestigacao.paraConsulta(
+                "Consulte versão inexistente",
+                new FerramentaConsultaArtefatos.Parametros(null, "99.99.99")
+        );
+
+        RespostaInvestigacao resposta = agente.investigar(pergunta);
+
+        assertThat(resposta.evidenciaSuficiente()).isFalse();
+        assertThat(resposta.explicacaoFundamentada()).contains("Nenhum artefato oficial encontrado");
+    }
+
+    @Test
+    void deveValidarFerramentasPermitidasERecusarFerramentasNaoAutorizadas() {
+        assertThat(agente.obterFerramentasDisponiveis())
+                .containsExactlyInAnyOrder("validar_xml", "comparar_esquemas", "consultar_artefatos");
+
+        assertThat(agente.ehFerramentaPermitida("validar_xml")).isTrue();
+        assertThat(agente.ehFerramentaPermitida("executar_comando_bash")).isFalse();
+        assertThat(agente.ehFerramentaPermitida("banco_dados_pacientes")).isFalse();
+
+        RespostaInvestigacao respostaNaoPermitida = agente.executarFerramentaPorNome("executar_bash", null);
+        assertThat(respostaNaoPermitida.evidenciaSuficiente()).isFalse();
+        assertThat(respostaNaoPermitida.explicacaoFundamentada()).contains("não é permitida");
+    }
 }
