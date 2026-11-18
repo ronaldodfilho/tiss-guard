@@ -4,6 +4,8 @@ import br.com.tissguard.api.dto.ArtefatoCatalogoDto;
 import br.com.tissguard.api.dto.ErroValidacaoItemDto;
 import br.com.tissguard.api.dto.ResultadoComparacaoEsquemasDto;
 import br.com.tissguard.api.dto.ResultadoValidacaoXmlDto;
+import br.com.tissguard.api.dto.SolicitacaoComparacaoEsquemasDto;
+import br.com.tissguard.api.dto.SolicitacaoValidacaoXmlDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,6 +26,60 @@ public class AgenteInvestigador {
         this.ferramentaConsulta = Objects.requireNonNull(ferramentaConsulta, "A ferramenta de consulta não pode ser nula");
         this.ferramentaValidacao = Objects.requireNonNull(ferramentaValidacao, "A ferramenta de validação não pode ser nula");
         this.ferramentaComparacao = Objects.requireNonNull(ferramentaComparacao, "A ferramenta de comparação não pode ser nula");
+    }
+
+    public List<String> obterFerramentasDisponiveis() {
+        return List.of(
+                ferramentaConsulta.nome(),
+                ferramentaValidacao.nome(),
+                ferramentaComparacao.nome()
+        );
+    }
+
+    public boolean ehFerramentaPermitida(String nomeFerramenta) {
+        if (nomeFerramenta == null || nomeFerramenta.isBlank()) {
+            return false;
+        }
+        return obterFerramentasDisponiveis().contains(nomeFerramenta);
+    }
+
+    public RespostaInvestigacao executarFerramentaPorNome(String nomeFerramenta, Object entrada) {
+        if (!ehFerramentaPermitida(nomeFerramenta)) {
+            return RespostaInvestigacao.semEvidencia(
+                    "Acesso negado: a ferramenta '" + nomeFerramenta + "' não é permitida ou não existe no ambiente seguro do agente.",
+                    "O agente possui limites rígidos de segurança. Ferramentas autorizadas: " + obterFerramentasDisponiveis()
+            );
+        }
+
+        if (ferramentaConsulta.nome().equals(nomeFerramenta)) {
+            FerramentaConsultaArtefatos.Parametros parametros = entrada instanceof FerramentaConsultaArtefatos.Parametros p ? p : null;
+            return investigarConsulta(PerguntaInvestigacao.paraConsulta("Consulta direta de artefato", parametros));
+        }
+
+        if (ferramentaValidacao.nome().equals(nomeFerramenta)) {
+            if (entrada instanceof SolicitacaoValidacaoXmlDto solicitacao) {
+                return investigarValidacao(PerguntaInvestigacao.paraValidacao("Validação direta de XML", solicitacao));
+            }
+            return RespostaInvestigacao.semEvidencia(
+                    "Evidência insuficiente: parâmetros inválidos para validação XML.",
+                    "Forneça um objeto SolicitacaoValidacaoXmlDto válido."
+            );
+        }
+
+        if (ferramentaComparacao.nome().equals(nomeFerramenta)) {
+            if (entrada instanceof SolicitacaoComparacaoEsquemasDto solicitacao) {
+                return investigarComparacao(PerguntaInvestigacao.paraComparacao("Comparação direta de esquemas", solicitacao));
+            }
+            return RespostaInvestigacao.semEvidencia(
+                    "Evidência insuficiente: parâmetros inválidos para comparação de esquemas.",
+                    "Forneça um objeto SolicitacaoComparacaoEsquemasDto válido."
+            );
+        }
+
+        return RespostaInvestigacao.semEvidencia(
+                "Ferramenta não executável no fluxo atual.",
+                "Consulte as ferramentas homologadas."
+        );
     }
 
     public RespostaInvestigacao investigar(PerguntaInvestigacao pergunta) {
@@ -109,15 +165,14 @@ public class AgenteInvestigador {
             );
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Foram localizados ").append(artefatos.size()).append(" artefato(s) oficial(is) no catálogo: ");
+        StringBuilder sbFinal = new StringBuilder();
+        sbFinal.append("Foram localizados ").append(artefatos.size()).append(" artefato(s) oficial(is) no catálogo: ");
         for (ArtefatoCatalogoDto art : artefatos) {
-            sb.append("Artefato '").append(art.nome()).append("' (versão ").append(art.versaoDeclarada())
+            sbFinal.append("Artefato '").append(art.nome()).append("' (versão ").append(art.versaoDeclarada())
                     .append(", componente ").append(art.componente())
                     .append(", hash: ").append(art.hashSha256()).append("); ");
         }
 
-        return RespostaInvestigacao.comSucesso(ferramentaConsulta.nome(), artefatos, sb.toString().trim());
+        return RespostaInvestigacao.comSucesso(ferramentaConsulta.nome(), artefatos, sbFinal.toString().trim());
     }
 }
-
