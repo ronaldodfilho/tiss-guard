@@ -15,10 +15,9 @@ public class LocalizadorEsquemas {
 
     public Source localizarFonte(String versao, String nomeArquivo) {
         Objects.requireNonNull(versao, "A versão do esquema não pode ser nula");
+        validarSegmentoSeguro(versao);
 
-        String arquivoResolvido = (nomeArquivo != null && !nomeArquivo.isBlank())
-                ? nomeArquivo.trim()
-                : resolverNomePadrao(versao);
+        String arquivoResolvido = resolverArquivoSeguro(versao, nomeArquivo);
 
         Optional<Path> caminhoDisco = buscarEmDisco(versao, arquivoResolvido);
         if (caminhoDisco.isPresent()) {
@@ -41,24 +40,41 @@ public class LocalizadorEsquemas {
 
     public Path localizarCaminho(String versao, String nomeArquivo) {
         Objects.requireNonNull(versao, "A versão do esquema não pode ser nula");
+        validarSegmentoSeguro(versao);
 
-        String arquivoResolvido = (nomeArquivo != null && !nomeArquivo.isBlank())
-                ? nomeArquivo.trim()
-                : resolverNomePadrao(versao);
+        String arquivoResolvido = resolverArquivoSeguro(versao, nomeArquivo);
 
         Optional<Path> caminhoDisco = buscarEmDisco(versao, arquivoResolvido);
         if (caminhoDisco.isPresent()) {
             return caminhoDisco.get();
         }
 
-        Path caminhoTestResources = Path.of("src", "test", "resources", "esquemas_xsd", arquivoResolvido);
-        if (Files.exists(caminhoTestResources)) {
-            return caminhoTestResources;
+        if (nomeArquivo == null || nomeArquivo.isBlank()) {
+            String alternativo = arquivoResolvido.replace(".xsd", "_evolucao.xsd");
+            Optional<Path> caminhoAlternativo = buscarEmDisco(versao, alternativo);
+            if (caminhoAlternativo.isPresent()) {
+                return caminhoAlternativo.get();
+            }
         }
 
         throw new EsquemaNaoEncontradoException(
                 "Arquivo físico do esquema XSD não encontrado para a versão '" + versao + "' e arquivo '" + arquivoResolvido + "'."
         );
+    }
+
+    private String resolverArquivoSeguro(String versao, String nomeArquivo) {
+        if (nomeArquivo != null && !nomeArquivo.isBlank()) {
+            String limpo = nomeArquivo.trim();
+            validarSegmentoSeguro(limpo);
+            return limpo;
+        }
+        return resolverNomePadrao(versao);
+    }
+
+    private void validarSegmentoSeguro(String segmento) {
+        if (segmento.contains("..") || segmento.contains("/") || segmento.contains("\\") || segmento.contains("\0")) {
+            throw new XmlSegurancaException("Parâmetro de localização contém caracteres de travessia de diretório não permitidos.");
+        }
     }
 
     private Optional<Path> buscarEmDisco(String versao, String nomeArquivo) {
@@ -67,14 +83,14 @@ public class LocalizadorEsquemas {
             return Optional.of(caminhoVersoes);
         }
 
-        Path caminhoTestResources = Path.of("src", "test", "resources", "esquemas_xsd", nomeArquivo);
-        if (Files.exists(caminhoTestResources)) {
-            return Optional.of(caminhoTestResources);
-        }
-
         Path caminhoMainResources = Path.of("src", "main", "resources", "esquemas_xsd", nomeArquivo);
         if (Files.exists(caminhoMainResources)) {
             return Optional.of(caminhoMainResources);
+        }
+
+        Path caminhoTestResources = Path.of("src", "test", "resources", "esquemas_xsd", nomeArquivo);
+        if (Files.exists(caminhoTestResources)) {
+            return Optional.of(caminhoTestResources);
         }
 
         return Optional.empty();
