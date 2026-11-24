@@ -1,68 +1,76 @@
-# TISS Guard - Monitoramento de Versões e Validação Técnica do Padrão TISS
+# TISS Guard - Version Monitoring and Technical Validation for the ANS TISS Standard
 
-Aplicação desenvolvida em Java 21 com Spring Boot para catalogar artefatos oficiais, validar mensagens XML contra esquemas XSD, comparar estruturalmente versões do padrão TISS da ANS (Agência Nacional de Saúde Suplementar) e diagnosticar quebras de contrato.
+> **Language:** English | [Português (BR)](README.pt-BR.md)
 
-Conta com núcleo de validação seguro contra XXE, API REST estruturada, agente investigador determinístico baseado em ferramentas técnicas, interface web de demonstração e pipeline de testes automatizados com GitHub Actions.
+<p align="center">
+  <img src="docs/demo-tiss-guard.gif" alt="TISS Guard Demo" width="100%" />
+</p>
 
----
+Java 21 and Spring Boot application built to catalog official artifacts, validate XML messages against XSD schemas, perform structural diffs across versions of the Brazilian ANS TISS standard (Agência Nacional de Saúde Suplementar), and diagnose breaking contract changes.
 
-## Recursos e Funcionalidades
-
-* **Catálogo Oficial com Integridade SHA-256:** Registro de metadados de artefatos TISS com verificação de integridade criptográfica, detecção de alterações e coexistência resiliente de múltiplas versões.
-* **Validação XML/XSD Segura:** Validação estrutural contra esquemas XSD oficiais diferenciando XML malformado de XML inválido, com indicação de linha, coluna, categoria de erro e bloqueio de entidades externas (XXE) e travessia de diretório.
-* **Comparação Estrutural e Quebra de Contrato:** Análise reproduzível entre duas versões de esquemas XSD, classificando alterações aditivas, restritivas e quebras de contrato com diagnóstico de impacto e hashes de referência.
-* **Agente Investigador com Ferramentas:** Agente restrito a ferramentas técnicas homologadas (`consultar_artefatos`, `validar_xml`, `comparar_esquemas`), vinculando respostas a evidências reais e recusando solicitações fora de escopo ou sem dados suficientes.
-* **Interface Web de Demonstração:** Painel interativo para consultar o catálogo, validar XMLs sintéticos, comparar versões de esquemas e acionar o agente investigador diretamente no navegador.
-* **Integração Contínua (GitHub Actions):** Execução automatizada de build e suíte de testes unitários e integrados a cada push ou pull request na branch `main`.
+It includes an XXE-hardened validation core, structured REST API, deterministic tool-grounded investigator agent, minimalist web demo interface, and an automated GitHub Actions CI pipeline.
 
 ---
 
-## Estrutura do projeto
+## Features and Capabilities
+
+* **Official Catalog with SHA-256 Integrity:** Stores TISS artifact metadata with cryptographic integrity verification, change detection, and resilient multi-version coexistence.
+* **Safe XML/XSD Validation:** Structural validation against official XSD schemas distinguishing malformed XML from schema-invalid XML, reporting line, column, and error category while blocking XXE and path traversal attacks.
+* **Structural Diff and Breaking-Change Analysis:** Reproducible comparison between two XSD versions classifying additive, restrictive, and breaking changes with impact diagnosis and reference hashes.
+* **Tool-Grounded Investigator Agent:** Restricted to whitelisted local tools (`consultar_artefatos`, `validar_xml`, `comparar_esquemas`), linking answers to real technical evidence and refusing out-of-scope or unsupported requests.
+* **Minimalist Web Demo Interface:** Clean browser UI to inspect the catalog, validate synthetic XML payloads, compare schema versions, and query the investigator agent.
+* **Continuous Integration (GitHub Actions):** Automated build and full unit/integration test execution on every push or pull request to `main`.
+
+---
+
+## Project Structure
 
 ```text
 .
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                       # Pipeline de build e testes via GitHub Actions
+│       └── ci.yml                       # Automated build & test pipeline via GitHub Actions
 ├── docs/
-│   ├── fonte_oficial_tiss.md            # Registro das fontes oficiais da ANS
-│   └── limitacoes_demonstracao.md       # Limitações conhecidas do escopo atual
+│   ├── demo-tiss-guard.gif              # Animated demo of the web interface
+│   ├── fonte_oficial_tiss.md            # Official ANS reference sources
+│   └── limitacoes_demonstracao.md       # Known scope limitations
 ├── src/
 │   ├── main/
 │   │   ├── java/br/com/tissguard/
-│   │   │   ├── agente/                  # Ferramentas explícitas e AgenteInvestigador
-│   │   │   ├── api/                     # Controladores REST, DTOs e tratamento global de erros
-│   │   │   ├── catalogo/                # Catálogo local, hash SHA-256 e detecção de alterações
-│   │   │   ├── comparacao/              # Comparador estrutural de XSD e diagnóstico de quebra
-│   │   │   ├── config/                  # Propriedades por ambiente e inicialização do catálogo
-│   │   │   ├── dominio/                 # Modelos de domínio TISS
-│   │   │   ├── fontes/                  # Obtenção resiliente de artefatos oficiais
-│   │   │   ├── validacao/               # Parser XML seguro, validador XSD e proteções de entrada
+│   │   │   ├── agente/                  # Explicit tools and AgenteInvestigador
+│   │   │   ├── api/                     # REST controllers, DTOs, and global error handling
+│   │   │   ├── catalogo/                # Local catalog, SHA-256 hashing, and change detection
+│   │   │   ├── comparacao/              # Structural XSD diff engine and breaking-change diagnosis
+│   │   │   ├── config/                  # Environment properties and default catalog bootstrap
+│   │   │   ├── dominio/                 # TISS domain models
+│   │   │   ├── fontes/                  # Resilient artifact fetcher
+│   │   │   ├── validacao/               # Safe XML parser, XSD validator, and input guards
 │   │   │   └── TissGuardApplication.java
 │   │   └── resources/
-│   │       ├── esquemas_xsd/            # Esquemas XSD de referência para execução limpa
-│   │       ├── static/                  # Interface web de demonstração (HTML, CSS e JS)
-│   │       ├── application.properties   # Configuração parametrizada por variáveis de ambiente
+│   │       ├── esquemas_xsd/            # Reference XSD schemas for clean-environment runs
+│   │       ├── static/                  # Minimalist web UI (HTML, CSS, JS)
+│   │       ├── application.properties   # Environment-variable-driven configuration
 │   │       └── application-demo.properties
-│   └── test/                            # Testes unitários, de borda, API, integração e aceite MVP
-├── .env.example                         # Exemplo de variáveis de ambiente
+│   └── test/                            # Unit, edge-case, API, integration, and MVP tests
+├── .env.example                         # Example environment variables
 ├── .gitignore
-├── pom.xml                              # Configuração Maven e dependências Spring Boot
-└── README.md
+├── pom.xml                              # Maven build & Spring Boot dependencies
+├── README.md                            # English documentation
+└── README.pt-BR.md                      # Portuguese documentation
 ```
 
 ---
 
-## Como executar
+## How to Run
 
-### 1. Pré-requisitos
+### 1. Prerequisites
 
 * Java 21 (JDK 21)
 * Apache Maven 3.9+
 
-### 2. Variáveis de Ambiente (Opcional)
+### 2. Environment Variables (Optional)
 
-A aplicação possui valores padrão seguros, mas pode ser configurada via variáveis de ambiente (conforme `.env.example`):
+The application ships with safe defaults and can be configured via environment variables (see `.env.example`):
 
 ```env
 SERVER_PORT=8080
@@ -73,50 +81,50 @@ TISSGUARD_DIRETORIO_ARTEFATOS=dados/artefatos
 TISSGUARD_TIMEOUT_VALIDACAO_SEGUNDOS=10
 ```
 
-### 3. Execução da Aplicação e Interface Web
+### 3. Start the Application and Web Interface
 
 ```bash
 mvn spring-boot:run
 ```
 
-Ou com o perfil de demonstração:
+Or using the demo profile:
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=demo
 ```
 
-Acesse no navegador: `http://localhost:8080`
+Open in your browser: `http://localhost:8080`
 
-### 4. Execução dos Testes Automatizados
+### 4. Run the Automated Test Suite
 
 ```bash
 mvn clean test
 ```
 
-### 5. Principais Endpoints da API
+### 5. Main API Endpoints
 
-* `GET /api/v1/artefatos` — Lista os artefatos catalogados (com filtro opcional por `componente`).
-* `GET /api/v1/artefatos/versoes` — Lista as versões disponíveis no catálogo.
-* `POST /api/v1/validacao/xml` — Valida um conteúdo XML sintético contra a versão de esquema informada.
-* `POST /api/v1/comparacao/esquemas` — Compara estruturalmente duas versões de esquemas XSD.
-* `POST /api/v1/agente/investigar` — Executa investigação técnica fundamentada nas ferramentas do agente.
-
----
-
-## Automação com GitHub Actions
-
-O workflow `.github/workflows/ci.yml` executa automaticamente `mvn -B clean test` em ambiente Linux limpo com Java 21 (Temurin) a cada push ou pull request para a branch `main`.
+* `GET /api/v1/artefatos` — Lists cataloged artifacts (optional `componente` filter).
+* `GET /api/v1/artefatos/versoes` — Lists available schema versions in the catalog.
+* `POST /api/v1/validacao/xml` — Validates a synthetic XML payload against the selected XSD version.
+* `POST /api/v1/comparacao/esquemas` — Compares two XSD schema versions structurally.
+* `POST /api/v1/agente/investigar` — Runs a deterministic tool-backed technical investigation.
 
 ---
 
-## Limitações Conhecidas
+## GitHub Actions Automation
 
-* A validação XML/XSD verifica conformidade estrutural e não substitui regras de negócio, tabelas TUSS ou auditoria de faturamento/glosa.
-* Utilize apenas exemplos sintéticos na interface de demonstração; não envie dados reais de pacientes.
-* Detalhes completos das limitações técnicas estão documentados em `docs/limitacoes_demonstracao.md`.
+The `.github/workflows/ci.yml` workflow automatically runs `mvn -B clean test` in a clean Linux environment with Java 21 (Temurin) on every push or pull request to `main`.
 
 ---
 
-## Autor
+## Known Limitations
+
+* XML/XSD validation verifies structural compliance only and does not replace billing rules, TUSS tables, or medical claim auditing.
+* Use only synthetic XML examples in the demo interface; never submit real patient data.
+* Full technical limitations are documented in `docs/limitacoes_demonstracao.md`.
+
+---
+
+## Author
 
 Ronaldo Dutra Filho
