@@ -3,168 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TISS Guard - Monitoramento e Validação Técnica do Padrão TISS</title>
+    <title>TISS Guard — Validação e Monitoramento TISS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/estilo.css">
 </head>
 <body>
-    <header class="cabecalho">
-        <div class="conteiner">
-            <div class="marca">
-                <span class="icone-marca">&#9670;</span>
-                <h1>TISS Guard</h1>
-                <span class="versao-badge">v0.0.1</span>
+    <a href="#conteudo-principal" class="skip-link">Pular para o conteúdo</a>
+
+    <header class="header">
+        <div class="container header-inner">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                </span>
+                <span class="brand-name">TISS Guard</span>
             </div>
-            <p class="subtitulo">Monitoramento de versões, validação estrutural XSD e investigação técnica de artefatos ANS</p>
+
+            <nav class="tabs" role="tablist" aria-label="Funcionalidades">
+                <button type="button" class="tab-btn active" role="tab" aria-selected="true" aria-controls="painel-catalogo" data-tab="catalogo">Catálogo</button>
+                <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="painel-validacao" data-tab="validacao">Validar XML</button>
+                <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="painel-comparacao" data-tab="comparacao">Comparar XSD</button>
+                <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="painel-agente" data-tab="agente">Agente</button>
+            </nav>
         </div>
     </header>
 
-    <main class="conteiner principal">
-        <section class="cartao" id="secao-catalogo">
-            <div class="cartao-cabecalho">
-                <h2>1. Catálogo Oficial de Artefatos TISS</h2>
-                <button id="btn-atualizar-catalogo" class="btn btn-secundario">Atualizar Catálogo</button>
+    <main id="conteudo-principal" class="container main">
+        <section id="painel-catalogo" class="panel" role="tabpanel">
+            <div class="panel-head">
+                <div>
+                    <h1>Catálogo Oficial TISS</h1>
+                    <p class="subtitle">Esquemas XSD registrados com versão declarada e integridade SHA-256.</p>
+                </div>
+                <button type="button" id="btn-atualizar-catalogo" class="btn btn-outline">Atualizar</button>
             </div>
-            <p class="descricao">Artefatos normativos obtidos de fontes oficiais documentadas com hash SHA-256 e integridade verificável.</p>
-            <div class="tabela-responsiva">
-                <table class="tabela" id="tabela-artefatos">
-                    <thead>
-                        <tr>
-                            <th>Nome do Artefato</th>
-                            <th>Componente</th>
-                            <th>Versão Declarada</th>
-                            <th>Arquivo XSD</th>
-                            <th>Integridade</th>
-                            <th>Hash SHA-256</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpo-tabela-artefatos">
-                        <tr>
-                            <td colspan="6" class="texto-centro">Carregando catálogo...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
 
-        <section class="cartao" id="secao-validacao">
-            <div class="cartao-cabecalho">
-                <h2>2. Validação Estrutural de Mensagem XML</h2>
-            </div>
-            <p class="descricao">Validação de conformidade contra esquemas XSD locais oficiais, com proteção contra entidades externas (XXE) e diagnósticos com linha e coluna.</p>
-            
-            <form id="form-validacao" class="formulario">
-                <div class="linha-formulario">
-                    <div class="grupo-campo">
-                        <label for="select-versao-validacao">Versão do Esquema TISS:</label>
-                        <select id="select-versao-validacao" class="campo-selecao" required>
-                            <option value="">Selecione uma versão...</option>
-                        </select>
-                    </div>
-                    <div class="grupo-campo">
-                        <label for="input-nome-arquivo">Nome do Arquivo:</label>
-                        <input type="text" id="input-nome-arquivo" class="campo-texto" value="guia_sintetica_teste.xml" required>
-                    </div>
-                </div>
-
-                <div class="grupo-campo">
-                    <div class="cabecalho-textarea">
-                        <label for="textarea-xml">Conteúdo XML Sintético:</label>
-                        <div class="botoes-exemplo">
-                            <button type="button" id="btn-exemplo-valido" class="btn-link">Carregar Exemplo Válido</button>
-                            <span class="separador">|</span>
-                            <button type="button" id="btn-exemplo-invalido" class="btn-link">Carregar Exemplo Inválido</button>
-                        </div>
-                    </div>
-                    <textarea id="textarea-xml" class="campo-textarea" rows="10" placeholder="Cole o conteúdo XML da mensagem TISS aqui..." required></textarea>
-                </div>
-
-                <div class="acoes-formulario">
-                    <button type="submit" id="btn-validar-xml" class="btn btn-primario">Validar Mensagem XML</button>
-                </div>
-            </form>
-
-            <div id="resultado-validacao" class="painel-resultado oculto">
-                <div class="resultado-cabecalho">
-                    <span id="badge-status-validacao" class="badge"></span>
-                    <h3 id="titulo-resultado-validacao"></h3>
-                </div>
-                <p id="mensagem-resumo-validacao" class="resumo-texto"></p>
-                <div id="bloco-erros-validacao" class="oculto">
-                    <h4>Inconsistências Identificadas</h4>
-                    <table class="tabela tabela-erros">
+            <div class="card">
+                <div class="table-wrap">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Linha</th>
-                                <th>Coluna</th>
-                                <th>Categoria</th>
-                                <th>Detalhe Técnico do Erro</th>
+                                <th>Artefato</th>
+                                <th>Versão</th>
+                                <th>Arquivo XSD</th>
+                                <th>Status</th>
+                                <th>SHA-256</th>
+                                <th class="col-right">Ação</th>
                             </tr>
                         </thead>
-                        <tbody id="corpo-tabela-erros"></tbody>
+                        <tbody id="corpo-tabela-artefatos">
+                            <tr>
+                                <td colspan="6" class="empty-cell">Carregando artefatos...</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <section class="cartao" id="secao-comparacao">
-            <div class="cartao-cabecalho">
-                <h2>3. Comparação Estrutural de Esquemas e Quebra de Contrato</h2>
+        <section id="painel-validacao" class="panel" role="tabpanel" hidden>
+            <div class="panel-head">
+                <div>
+                    <h1>Validar XML contra XSD</h1>
+                    <p class="subtitle">Use apenas arquivos XML sintéticos. Proteção contra XXE e path traversal ativa.</p>
+                </div>
+                <div class="actions-inline">
+                    <button type="button" id="btn-exemplo-valido" class="btn btn-soft">Exemplo Válido</button>
+                    <button type="button" id="btn-exemplo-invalido" class="btn btn-soft">Exemplo Inválido</button>
+                </div>
             </div>
-            <p class="descricao">Comparação determinística entre versões do padrão TISS para identificar elementos adicionados, removidos e alterações restritivas de contrato.</p>
 
-            <form id="form-comparacao" class="formulario">
-                <div class="linha-formulario">
-                    <div class="grupo-campo">
-                        <label for="select-versao-base">Versão Base (Atual):</label>
-                        <select id="select-versao-base" class="campo-selecao" required>
+            <div class="card">
+                <form id="form-validacao" class="form">
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="select-versao-validacao">Versão do Esquema</label>
+                            <select id="select-versao-validacao" class="input" required>
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="input-nome-arquivo">Nome do Arquivo (.xml)</label>
+                            <input type="text" id="input-nome-arquivo" class="input mono" value="guia_sintetica.xml" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-top">
+                            <label for="textarea-xml">Conteúdo XML</label>
+                            <label for="input-arquivo-xml" class="file-link">Importar arquivo .xml</label>
+                            <input type="file" id="input-arquivo-xml" accept=".xml,text/xml,application/xml" class="sr-only">
+                        </div>
+                        <textarea id="textarea-xml" class="textarea mono" rows="10" spellcheck="false" placeholder="Cole o XML sintético aqui..." required></textarea>
+                    </div>
+
+                    <div class="form-footer">
+                        <button type="button" id="btn-limpar-xml" class="btn btn-outline">Limpar</button>
+                        <button type="submit" id="btn-validar-xml" class="btn btn-primary">Validar XML</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="resultado-validacao" class="card oculto" aria-live="polite">
+                <div class="result-head">
+                    <span id="badge-status-validacao" class="badge"></span>
+                    <h2 id="titulo-resultado-validacao"></h2>
+                </div>
+                <p id="mensagem-resumo-validacao" class="result-msg"></p>
+
+                <div id="bloco-erros-validacao" class="oculto">
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Linha</th>
+                                    <th>Coluna</th>
+                                    <th>Categoria</th>
+                                    <th>Erro</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-tabela-erros"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="painel-comparacao" class="panel" role="tabpanel" hidden>
+            <div class="panel-head">
+                <div>
+                    <h1>Comparar Esquemas XSD</h1>
+                    <p class="subtitle">Identifique diferenças estruturais e quebras de contrato entre versões.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <form id="form-comparacao" class="compare-bar">
+                    <div class="field">
+                        <label for="select-versao-base">Versão Base</label>
+                        <select id="select-versao-base" class="input" required>
                             <option value="">Selecione...</option>
                         </select>
                     </div>
-                    <div class="grupo-campo">
-                        <label for="select-versao-comparada">Versão Comparada (Nova/Evolução):</label>
-                        <select id="select-versao-comparada" class="campo-selecao" required>
+                    <div class="field">
+                        <label for="select-versao-comparada">Versão Comparada</label>
+                        <select id="select-versao-comparada" class="input" required>
                             <option value="">Selecione...</option>
                         </select>
                     </div>
-                </div>
-                <div class="acoes-formulario">
-                    <button type="submit" id="btn-comparar-esquemas" class="btn btn-primario">Executar Comparação Estrutural</button>
-                </div>
-            </form>
+                    <button type="submit" id="btn-comparar-esquemas" class="btn btn-primary">Comparar</button>
+                </form>
+            </div>
 
-            <div id="resultado-comparacao" class="painel-resultado oculto">
-                <div class="resultado-cabecalho">
+            <div id="resultado-comparacao" class="card oculto" aria-live="polite">
+                <div class="result-head">
                     <span id="badge-status-comparacao" class="badge"></span>
-                    <h3 id="titulo-resultado-comparacao"></h3>
+                    <h2 id="titulo-resultado-comparacao"></h2>
                 </div>
-                <div class="grade-metricas">
-                    <div class="cartao-metrica">
-                        <span class="rotulo-metrica">Total de Diferenças</span>
-                        <span id="metrica-total-diferencas" class="valor-metrica">0</span>
+
+                <div class="stats-row">
+                    <div class="stat">
+                        <span class="stat-label">Total</span>
+                        <strong id="metrica-total-diferencas" class="stat-num">0</strong>
                     </div>
-                    <div class="cartao-metrica alerta">
-                        <span class="rotulo-metrica">Quebras de Contrato</span>
-                        <span id="metrica-quebras-contrato" class="valor-metrica">0</span>
+                    <div class="stat danger">
+                        <span class="stat-label">Quebras de Contrato</span>
+                        <strong id="metrica-quebras-contrato" class="stat-num">0</strong>
                     </div>
-                    <div class="cartao-metrica sucesso">
-                        <span class="rotulo-metrica">Elementos Adicionados</span>
-                        <span id="metrica-elementos-adicionados" class="valor-metrica">0</span>
+                    <div class="stat success">
+                        <span class="stat-label">Aditivas</span>
+                        <strong id="metrica-elementos-adicionados" class="stat-num">0</strong>
                     </div>
                 </div>
-                <div class="diagnostico-box">
+
+                <div class="note-box">
                     <p><strong>Diagnóstico:</strong> <span id="diagnostico-comparacao-texto"></span></p>
-                    <p><strong>Recomendação de Integração:</strong> <span id="recomendacao-comparacao-texto"></span></p>
+                    <p><strong>Recomendação:</strong> <span id="recomendacao-comparacao-texto"></span></p>
                 </div>
-                <div id="bloco-lista-diferencas">
-                    <h4>Lista Detalhada de Diferenças Estruturais</h4>
-                    <table class="tabela tabela-diferencas">
+
+                <div class="table-wrap">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th>Tipo de Alteração</th>
-                                <th>Localização / Tag</th>
+                                <th>Tipo</th>
+                                <th>Caminho Estrutural</th>
                                 <th>Severidade</th>
-                                <th>Descrição da Mudança</th>
+                                <th>Descrição</th>
                             </tr>
                         </thead>
                         <tbody id="corpo-tabela-diferencas"></tbody>
@@ -173,51 +203,57 @@
             </div>
         </section>
 
-        <section class="cartao" id="secao-agente">
-            <div class="cartao-cabecalho">
-                <h2>4. Agente Investigador TISS</h2>
-            </div>
-            <p class="descricao">Investigação automatizada fundamentada estritamente em ferramentas técnicas locais. O agente recusa solicitações fora de escopo e não inventa evidências.</p>
-
-            <div class="botoes-investigacao-rapida">
-                <button type="button" id="btn-agente-investigar-xml" class="btn btn-secundario">Investigar XML Atual</button>
-                <button type="button" id="btn-agente-investigar-comparacao" class="btn btn-secundario">Diagnosticar Quebra de Esquemas</button>
-                <button type="button" id="btn-agente-consultar-catalogo" class="btn btn-secundario">Listar Artefatos Homologados</button>
-                <button type="button" id="btn-agente-fora-escopo" class="btn btn-secundario">Testar Pergunta Fora de Escopo</button>
+        <section id="painel-agente" class="panel" role="tabpanel" hidden>
+            <div class="panel-head">
+                <div>
+                    <h1>Agente Investigador</h1>
+                    <p class="subtitle">Consultas fundamentadas em ferramentas locais homologadas, sem especulação.</p>
+                </div>
             </div>
 
-            <div id="resultado-agente" class="painel-resultado oculto">
-                <div class="resultado-cabecalho">
+            <div class="card">
+                <div class="agent-actions">
+                    <button type="button" id="btn-agente-investigar-xml" class="btn btn-soft">Investigar XML Atual</button>
+                    <button type="button" id="btn-agente-investigar-comparacao" class="btn btn-soft">Diagnosticar Quebra XSD</button>
+                    <button type="button" id="btn-agente-consultar-catalogo" class="btn btn-soft">Consultar Catálogo</button>
+                    <button type="button" id="btn-agente-fora-escopo" class="btn btn-outline">Testar Fora de Escopo</button>
+                </div>
+            </div>
+
+            <div id="resultado-agente" class="card oculto" aria-live="polite">
+                <div class="result-head">
                     <span id="badge-status-agente" class="badge"></span>
-                    <h3 id="titulo-resultado-agente"></h3>
+                    <h2 id="titulo-resultado-agente"></h2>
                 </div>
-                <div class="terminal-evidencia">
-                    <div class="linha-terminal">
-                        <span class="rotulo-terminal">Ferramenta Executada:</span>
-                        <code id="terminal-ferramenta" class="codigo-ferramenta"></code>
+
+                <dl class="evidence-list">
+                    <div class="evidence-item">
+                        <dt>Ferramenta</dt>
+                        <dd><code id="terminal-ferramenta" class="code-pill"></code></dd>
                     </div>
-                    <div class="linha-terminal">
-                        <span class="rotulo-terminal">Evidência Técnica Suficiente:</span>
-                        <span id="terminal-evidencia-status"></span>
+                    <div class="evidence-item">
+                        <dt>Evidência Suficiente</dt>
+                        <dd id="terminal-evidencia-status"></dd>
                     </div>
-                    <div class="linha-terminal">
-                        <span class="rotulo-terminal">Explicação Fundamentada:</span>
-                        <p id="terminal-explicacao" class="terminal-texto"></p>
+                    <div class="evidence-item">
+                        <dt>Explicação</dt>
+                        <dd id="terminal-explicacao"></dd>
                     </div>
-                    <div class="linha-terminal">
-                        <span class="rotulo-terminal">Limitação / Alerta Declarado:</span>
-                        <p id="terminal-limitacao" class="terminal-aviso"></p>
+                    <div class="evidence-item">
+                        <dt>Limitação / Alerta</dt>
+                        <dd id="terminal-limitacao" class="text-muted"></dd>
                     </div>
-                </div>
+                </dl>
+
+                <details class="details-json">
+                    <summary>Ver evidência técnica (JSON)</summary>
+                    <pre id="terminal-json-bruto" class="json-box mono"></pre>
+                </details>
             </div>
         </section>
     </main>
 
-    <footer class="rodape">
-        <div class="conteiner">
-            <p>TISS Guard &copy; 2026 - Projeto técnico para validação, resiliência normativa e monitoramento do padrão TISS (ANS).</p>
-        </div>
-    </footer>
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
     <script src="/js/app.js"></script>
 </body>
